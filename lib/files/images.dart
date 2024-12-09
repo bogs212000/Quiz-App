@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Images {
   static const sample_profile = 'https://media.craiyon.com/2023-09-18/89d65df4066d4dff9113f1bc839a1230.webp';
   static const anime_chibi = 'assets/images/anime_chibi.png';
-  static const technology = 'https://i.pinimg.com/736x/b7/15/e3/b715e31e732cc651299b8e9a93236995.jpg';
+  static const technology = 'https://img.freepik.com/free-vector/tech-computer-logo-template_23-2149204144.jpg';
 }
 
 class RankBadges {

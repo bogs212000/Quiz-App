@@ -29,6 +29,8 @@ class _AddFormState extends State<AddForm> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: AppColor.baseColor,
+          foregroundColor: Colors.white,
+          title: 'Add Questions'.text.make(),
         ),
         body: VxBox(
           child: SingleChildScrollView(
@@ -284,16 +286,36 @@ class _AddFormState extends State<AddForm> {
                     SizedBox(
                       width: 100,
                       child: ElevatedButton(
-                        onPressed: () => {
-                          AuthService().addQuestions(
-                              int.parse(levelController.text), // Parse level to integer
-                              int.parse(noController.text),    // Parse no to integer
+                        onPressed: () async => {
+                          Get.snackbar(
+                            'Loading',
+                            'Adding Question...',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.white,
+                            colorText: Colors.black,
+                            margin: const EdgeInsets.only(
+                                left: 10, right: 10, bottom: 70),
+                            padding: EdgeInsets.all(10),
+                            duration: Duration(seconds: 5),
+                          ),
+                          await AuthService().addQuestions(
+                              int.parse(levelController.text),
+                              // Parse level to integer
+                              int.parse(noController.text),
+                              // Parse no to integer
                               questionController.text,
                               aController.text,
                               bController.text,
                               cController.text,
                               dController.text,
-                              answerController.text)
+                              answerController.text),
+                          questionController.clear(),
+                          aController.clear(),
+                          bController.clear(),
+                          cController.clear(),
+                          dController.clear(),
+                          answerController.clear(),
+
                         },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

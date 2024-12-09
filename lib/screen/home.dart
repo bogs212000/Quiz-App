@@ -166,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                                 itemCount: levels.length,
                                 itemBuilder: (context, index) {
                                   final level = levels[index];
-                                  String levelId = level['level_id'];
+                                  String levelId = level['level'].toString();
 
                                   return FutureBuilder<QuerySnapshot>(
                                     future: FirebaseFirestore.instance
@@ -229,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                                                       child: VxBox(
                                                         child: VxCircle(
                                                           radius: 70,
-                                                          backgroundImage: DecorationImage(
+                                                          backgroundImage: const DecorationImage(
                                                               image: NetworkImage('${Images.technology}'),
                                                               fit: BoxFit.fill),
                                                         )

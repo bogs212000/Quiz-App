@@ -119,19 +119,38 @@ class _LoginPageState extends State<LoginPage> {
                 Spacer(),
                 ElevatedButton(
                     onPressed: () {
-                      Get.snackbar(
-                        margin: EdgeInsets.all(10),
-                        padding: EdgeInsets.all(10),
-                        'Loading',
-                        'Please wait while we process your login.',
-                        snackPosition: SnackPosition.BOTTOM,
-                        backgroundColor: Colors.white,
-                        colorText: AppColor.baseColor,
-                        isDismissible: false, // Make it non-dismissible until login is complete
-                      );
-                      AuthService().signIn(
-                          emailController.text.trim().toLowerCase(),
-                          passwordController.text.trim());
+                      if (emailController.text.isEmpty ||
+                          passwordController.text.isEmpty) {
+                        if(!Get.isSnackbarOpen){
+                          Get.snackbar(
+                            margin: EdgeInsets.all(10),
+                            padding: EdgeInsets.all(10),
+                            'Notice',
+                            'Please input your email and password.',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.orange,
+                            colorText: Colors.white,
+                            isDismissible:
+                            false, // Make it non-dismissible until login is complete
+                          );
+                        }
+
+                      } else {
+                        Get.snackbar(
+                          margin: EdgeInsets.all(10),
+                          padding: EdgeInsets.all(10),
+                          'Loading',
+                          'Please wait while we process your login.',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.white,
+                          colorText: AppColor.baseColor,
+                          isDismissible:
+                              false, // Make it non-dismissible until login is complete
+                        );
+                        AuthService().signIn(
+                            emailController.text.trim().toLowerCase(),
+                            passwordController.text.trim());
+                      }
                     },
                     child: AppText.login.text.bold.make()),
               ],

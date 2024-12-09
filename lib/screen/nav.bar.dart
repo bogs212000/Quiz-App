@@ -17,7 +17,7 @@ class NavBar extends StatefulWidget {
 }
 
 class _NavBarState extends State<NavBar> {
-  int selected = 1;
+  int selected = 0;
   bool heart = false;
   final controller = PageController();
 

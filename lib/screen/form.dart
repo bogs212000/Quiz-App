@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_app/files/colors.dart';
+import 'package:quiz_app/screen/nav.bar.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:get/get.dart';
 
@@ -26,7 +27,7 @@ class _AnswerFormState extends State<AnswerForm> {
   }
 
   void _checkQuizCompletion() async {
-    final quizId = Get.arguments[0];
+    final quizId = Get.arguments[1];
     final doc = await FirebaseFirestore.instance
         .collection('user_scores')
         .doc('$userEmail-$quizId') // Unique ID for user and quiz
@@ -42,7 +43,7 @@ class _AnswerFormState extends State<AnswerForm> {
   }
 
   Future<void> _submitAnswers(List<QueryDocumentSnapshot> questions) async {
-    final quizId = Get.arguments[0];
+    final quizId = Get.arguments[1];
     // Validate all questions have an answer
     if (userAnswers.length != questions.length) {
       // Show error if not all questions are answered
@@ -101,23 +102,18 @@ class _AnswerFormState extends State<AnswerForm> {
     } catch (e) {
       print(e);
     }
-
-    // Show score dialog
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Your Score'),
-          content: Text('You scored $score/${questions.length}'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
+    Get.snackbar(
+      margin: EdgeInsets.all(10),
+      padding: EdgeInsets.all(10),
+      'Hooray!',
+      'You got $score/${questions.length}, Score has been added.',
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+      isDismissible:
+      false, // Make it non-dismissible until login is complete
     );
+    Get.offAll(()=> NavBar());
   }
 
   @override
@@ -135,7 +131,18 @@ class _AnswerFormState extends State<AnswerForm> {
         ),
         child: Column(
           children: [
-            Image.asset(Images.anime_chibi, height: 100),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                VxCircle(
+                  radius: 70,
+                  backgroundImage: const DecorationImage(
+                      image: NetworkImage('${Images.technology}'),
+                      fit: BoxFit.fill),
+                ),
+                Image.asset(Images.anime_chibi, height: 100),
+              ],
+            ),
             Expanded(
               child: VxBox(
                 child: StreamBuilder<QuerySnapshot>(

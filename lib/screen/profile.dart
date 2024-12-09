@@ -156,7 +156,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: Colors.white,
                                 ),
                                 'Rank'.text.color(Colors.white54).make(),
-                                '$rank'
+                                rank == null ? '---'
+                                    .text
+                                    .color(Colors.white)
+                                    .size(20)
+                                    .extraBold
+                                    .make() : '$rank'
                                     .text
                                     .color(Colors.white)
                                     .size(20)

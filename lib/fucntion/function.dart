@@ -129,5 +129,24 @@ class AuthService {
       'd': d,
       'no': no,
     });
+    Get.snackbar(
+      margin: EdgeInsets.all(10),
+      padding: EdgeInsets.all(10),
+      'Success',
+      // Title
+      'Successfully added!',
+      // Message
+      snackPosition: SnackPosition.BOTTOM,
+      // Position of Snackbar
+      backgroundColor: Colors.green,
+      // Background color
+      colorText: Colors.white,
+      // Text color
+      duration: Duration(seconds: 3),
+      // Duration the snackbar will show
+      icon: const Icon(Icons.info,
+          color: Colors
+              .white), // Icon to show on the snackbar
+    );
   }
 }
