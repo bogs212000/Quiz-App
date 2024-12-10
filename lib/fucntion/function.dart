@@ -14,7 +14,7 @@ class AuthService {
       await auth.signInWithEmailAndPassword(email: email, password: password);
       Get.snackbar(
         'Login Successful',
-        'Welcome back, $currentUserEmail!',
+        'Welcome back, $email!',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
@@ -83,7 +83,7 @@ class AuthService {
 
       Get.snackbar(
         'Account has been created',
-        'Welcome, $currentUserEmail!',
+        'Welcome, $email!',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
@@ -114,6 +114,7 @@ class AuthService {
     await fbStore.collection('levels').doc(level.toString()).set({
       'level': level,
       'level_id': uid,
+      'status': false,
     });
     await fbStore
         .collection('levels')

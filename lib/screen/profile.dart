@@ -2,11 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:quiz_app/files/colors.dart';
 import 'package:velocity_x/velocity_x.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../files/images.dart';
 import '../fucntion/const.dart';
@@ -23,6 +25,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   UserModel? userModel;
+  double? size;
 
   @override
   void initState() {
@@ -36,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
       userModel = fetchedUser;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Get.snackbar(
                     'Notice',
                     'Continue to sign out?',
-                    snackPosition: SnackPosition.BOTTOM,
+                    snackPosition: SnackPosition.TOP,
                     backgroundColor: Colors.white,
                     colorText: Colors.black,
                     margin: EdgeInsets.only(left: 10, right: 10, bottom: 70),
@@ -72,8 +76,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   );
-
-                }, child: Icon(CupertinoIcons.escape)),
+                },
+                child: Icon(CupertinoIcons.escape)),
           ),
           Padding(
             padding: EdgeInsets.only(right: 20),
@@ -84,18 +88,35 @@ class _ProfilePageState extends State<ProfilePage> {
       body: VxBox(
         child: Column(
           children: [
-            VxCircle(
-              radius: 100,
-              backgroundImage: DecorationImage(
-                  image: NetworkImage('${userModel!.profile}'), fit: BoxFit.fill),
-            ),
+            rank == 1
+                ? Stack(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(AvatarFrame.admin_frame, height: 170),
+                        ],
+                      ),
+                      VxCircle(
+                        radius: 120,
+                        backgroundImage: DecorationImage(
+                            image: CachedNetworkImageProvider('${userModel!.profile}'),
+                            fit: BoxFit.fill),
+                      ).centered(),
+                    ],
+                  )
+                : VxCircle(
+                    radius: 100,
+                    backgroundImage: DecorationImage(
+                        image: CachedNetworkImageProvider('${userModel!.profile}'),
+                        fit: BoxFit.fill),
+                  ).centered(),
             10.heightBox,
             Expanded(
               child: VxBox(
                 child: Column(
                   children: [
-                    userModel!.username
-                        .text
+                    userModel!.username.text
                         .fontFamily("Rubik")
                         .color(Colors.black)
                         .size(25)
@@ -135,19 +156,19 @@ class _ProfilePageState extends State<ProfilePage> {
                               width: 70,
                             )
                           else if (userModel!.score > 40)
-                              Image.asset(
-                                RankBadges.rank_3,
-                                height: 60,
-                                width: 60,
-                              )
-                            else if (userModel!.score > 10)
-                                Image.asset(
-                                  RankBadges.rank,
-                                  height: 50,
-                                  width: 50,
-                                )
-                              else
-                                SizedBox(),
+                            Image.asset(
+                              RankBadges.rank_3,
+                              height: 60,
+                              width: 60,
+                            )
+                          else if (userModel!.score > 10)
+                            Image.asset(
+                              RankBadges.rank,
+                              height: 50,
+                              width: 50,
+                            )
+                          else
+                            SizedBox(),
                           Expanded(
                             child: Column(
                               children: [
@@ -156,17 +177,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: Colors.white,
                                 ),
                                 'Rank'.text.color(Colors.white54).make(),
-                                rank == null ? '---'
-                                    .text
-                                    .color(Colors.white)
-                                    .size(20)
-                                    .extraBold
-                                    .make() : '$rank'
-                                    .text
-                                    .color(Colors.white)
-                                    .size(20)
-                                    .extraBold
-                                    .make(),
+                                rank == null
+                                    ? '---'
+                                        .text
+                                        .color(Colors.white)
+                                        .size(20)
+                                        .extraBold
+                                        .make()
+                                    : '$rank'
+                                        .text
+                                        .color(Colors.white)
+                                        .size(20)
+                                        .extraBold
+                                        .make(),
                               ],
                             ),
                           ),

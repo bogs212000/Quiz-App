@@ -3,6 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:quiz_app/screen/admin.nav.bar.dart';
 import 'package:quiz_app/screen/login.dart';
 import 'package:quiz_app/screen/nav.bar.dart';
 
@@ -55,7 +56,7 @@ class Wrapper extends StatelessWidget {
                 return NavBar();
               }
               if ((userData.data!['role'] == "admin")) {
-                return NavBar();
+                return AdminNavBar();
               } else {
                 return LoginPage();
               }

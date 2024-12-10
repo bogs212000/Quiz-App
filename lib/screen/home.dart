@@ -1,11 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:quiz_app/fucntion/firebase.dart';
 import 'package:quiz_app/screen/form.dart';
+import 'package:quiz_app/screen/rank.info.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../files/colors.dart';
@@ -24,6 +27,28 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   UserModel? userModel;
+
+  String getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return "GOOD MORNING";
+    } else if (hour >= 12 && hour < 18) {
+      return "GOOD AFTERNOON";
+    } else {
+      return "GOOD EVENING";
+    }
+  }
+
+  IconData getIcon() {
+    final hour = DateTime.now().hour;
+    if (hour >= 5 && hour < 12) {
+      return Icons.light_mode_outlined; // Morning icon
+    } else if (hour >= 12 && hour < 18) {
+      return Icons.wb_sunny_outlined; // Afternoon icon
+    } else {
+      return Icons.nightlight_outlined; // Evening icon
+    }
+  }
 
   @override
   void initState() {
@@ -55,12 +80,12 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          Icons.light_mode_outlined,
+                        Icon(
+                          getIcon(),
                           color: AppColor.white,
                         ),
                         10.widthBox,
-                        "GOOD MORNING"
+                        getGreeting()
                             .text
                             .fontFamily("Rubik")
                             .color(AppColor.white)
@@ -80,46 +105,57 @@ class _HomePageState extends State<HomePage> {
                         VxCircle(
                           radius: 50,
                           backgroundImage: DecorationImage(
-                              image: NetworkImage('${userModel!.profile}'),
+                              image: CachedNetworkImageProvider(
+                                  '${userModel!.profile}'),
                               fit: BoxFit.fill),
                         )
                       ],
                     ),
                     10.heightBox,
                     Expanded(
-                      child: VxBox(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            AppText.feature.text.white.bold.size(15).make(),
-                            AppText.play_with_friends.text.white
-                                .fontFamily('Rubik')
-                                .center
-                                .bold
-                                .size(15)
-                                .make(),
-                            10.heightBox,
-                            SizedBox(
-                              width: 170,
-                              child: ElevatedButton(
-                                  onPressed: () => {},
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Icon(CupertinoIcons.heart_fill),
-                                      AppText.find_friends.text.make(),
-                                    ],
-                                  ),),
-                            )
-                          ],
-                        ),
-                      )
-                          .padding(EdgeInsets.all(30))
-                          .color(Colors.white.withOpacity(0.2))
-                          .rounded
-                          .width(double.infinity)
-                          .make(),
+                      child: Stack(
+                        children: [
+                          SpinKitSpinningLines(
+                              color: Colors.white.withOpacity(0.1), size: 200),
+                          VxBox(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AppText.feature.text.white.bold.size(15).make(),
+                                AppText.play_with_friends.text.white
+                                    .fontFamily('Rubik')
+                                    .center
+                                    .bold
+                                    .size(15)
+                                    .make(),
+                                10.heightBox,
+                                SizedBox(
+                                  width: 170,
+                                  child: ElevatedButton(
+                                    onPressed: () => {Get.to(() => RankInfo())},
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        SpinKitPumpingHeart(
+                                          size: 20,
+                                          color: AppColor.baseColor,
+                                        ),
+                                        AppText.find_friends.text.make(),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                              .padding(EdgeInsets.all(30))
+                              .color(Colors.white.withOpacity(0.2))
+                              .rounded
+                              .width(double.infinity)
+                              .make(),
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -140,13 +176,19 @@ class _HomePageState extends State<HomePage> {
                         child: StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
                                 .collection('levels')
-                                .orderBy('level', descending: true)
+                                .orderBy('level', descending: false)
+                                .where('status', isEqualTo: true)
                                 .snapshots(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
                                   ConnectionState.waiting) {
-                                return Center(
-                                    child: CircularProgressIndicator());
+                                return VxBox()
+                                    .height(100)
+                                    .width(double.infinity)
+                                    .white
+                                    .rounded
+                                    .shadow
+                                    .make();
                               }
 
                               if (snapshot.hasError) {
@@ -161,6 +203,9 @@ class _HomePageState extends State<HomePage> {
                               }
 
                               final levels = snapshot.data!.docs;
+                              String emailUser = FirebaseAuth
+                                  .instance.currentUser!.email
+                                  .toString();
 
                               return ListView.builder(
                                 itemCount: levels.length,
@@ -175,13 +220,24 @@ class _HomePageState extends State<HomePage> {
                                         .collection('who_answered')
                                         .where('userId',
                                             isEqualTo:
-                                                currentUserEmail) // Check if the user exists
+                                                emailUser) // Check if the user exists
                                         .get(),
                                     builder: (context, userSnapshot) {
                                       if (userSnapshot.connectionState ==
                                           ConnectionState.waiting) {
-                                        return const Center(
-                                            child: CircularProgressIndicator());
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: VxBox(
+                                                  child: const Center(
+                                                      child:
+                                                          CircularProgressIndicator()))
+                                              .height(100)
+                                              .width(double.infinity)
+                                              .white
+                                              .rounded
+                                              .shadow
+                                              .make(),
+                                        );
                                       }
 
                                       if (userSnapshot.hasError) {
@@ -197,15 +253,13 @@ class _HomePageState extends State<HomePage> {
                                         onTap: () {
                                           if (hasAnswered) {
                                             // If the user has already answered, show their score
-                                            Get.snackbar(
-                                              "Info",
-                                              "You already answered this quiz. Your score: ${userSnapshot.data!.docs.first['score']}",
-                                              backgroundColor: Colors.green,
-                                              colorText: Colors.white,
-                                              snackPosition:
-                                                  SnackPosition.BOTTOM,
-                                              margin: EdgeInsets.all(10)
-                                            );
+                                            Get.snackbar("Info",
+                                                "You already answered this quiz. Your score: ${userSnapshot.data!.docs.first['score']}",
+                                                backgroundColor: Colors.green,
+                                                colorText: Colors.white,
+                                                snackPosition:
+                                                    SnackPosition.BOTTOM,
+                                                margin: EdgeInsets.all(10));
                                           } else {
                                             // Navigate to the AnswerForm
                                             Get.to(() => AnswerForm(),
@@ -227,15 +281,15 @@ class _HomePageState extends State<HomePage> {
                                                   Expanded(
                                                     child: VxBox(
                                                       child: VxBox(
-                                                        child: VxCircle(
-                                                          radius: 70,
-                                                          backgroundImage: const DecorationImage(
-                                                              image: NetworkImage('${Images.technology}'),
-                                                              fit: BoxFit.fill),
-                                                        )
-                                                      )
-                                                          .rounded
-                                                          .make(),
+                                                          child: VxCircle(
+                                                        radius: 70,
+                                                        backgroundImage:
+                                                            const DecorationImage(
+                                                                image: CachedNetworkImageProvider(
+                                                                    '${Images.technology}'),
+                                                                fit: BoxFit
+                                                                    .fill),
+                                                      )).rounded.make(),
                                                     )
                                                         .padding(
                                                             const EdgeInsets

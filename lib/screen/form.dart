@@ -60,12 +60,30 @@ class _AnswerFormState extends State<AnswerForm> {
       return;
     }
 
-    // Calculate score
+    // Calculate score and collect incorrect answers
     score = 0;
+    List<Map<String, String>> wrongAnswers = [];
+
     for (var question in questions) {
       String questionId = question.id;
-      if (userAnswers[questionId] == question['answer']) {
+      String correctAnswer =
+          question['answer']; // Correct answer key (e.g., 'a', 'b')
+      String correctAnswerText = question[correctAnswer]; // Correct answer text
+      String? userAnswer = userAnswers[questionId]; // User's selected key
+      String userAnswerText = userAnswer != null
+          ? question[userAnswer]
+          : "No answer"; // User's answer text
+
+      if (userAnswer == correctAnswer) {
         score++;
+      } else {
+        // Collect wrong answers
+        wrongAnswers.add({
+          "question": question['question'],
+          "userAnswer":
+              userAnswer != null ? "$userAnswer: $userAnswerText" : "No answer",
+          "correctAnswer": "$correctAnswer: $correctAnswerText",
+        });
       }
     }
 
@@ -103,17 +121,76 @@ class _AnswerFormState extends State<AnswerForm> {
       print(e);
     }
     Get.snackbar(
-      margin: EdgeInsets.all(10),
-      padding: EdgeInsets.all(10),
-      'Hooray!',
-      'You got $score/${questions.length}, Score has been added.',
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      isDismissible:
-      false, // Make it non-dismissible until login is complete
-    );
-    Get.offAll(()=> NavBar());
+        margin: EdgeInsets.all(10),
+        padding: EdgeInsets.all(10),
+        'Hooray!',
+        'You got $score/${questions.length}, Score has been added.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        isDismissible: false,
+        // Make it non-dismissible until login is complete
+        duration: Duration(seconds: 5));
+    // Show results with wrong answers
+    // Show results
+    if (wrongAnswers.isEmpty) {
+      // All answers are correct
+      Get.dialog(
+        AlertDialog(
+          title: Text('Hooray!'),
+          content: 'You answered all questions correctly! 🎉'
+              .text
+              .bold
+              .size(20)
+              .make(),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.offAll(() => NavBar());
+              },
+              child: Text("Close"),
+            ),
+          ],
+        ),
+      );
+    } else {
+      Get.dialog(
+        barrierDismissible: false,
+        AlertDialog(
+          title: Text('Results'),
+          content: SizedBox(
+            height: 400,
+            child: ListView.builder(
+              itemCount: wrongAnswers.length,
+              itemBuilder: (context, index) {
+                final wrong = wrongAnswers[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    "Question: ${wrong['question']}".text.bold.make(),
+                    "Your Answer: ${wrong['userAnswer']}".text.red500.make(),
+                    "Correct Answer: ${wrong['correctAnswer']}"
+                        .text
+                        .green500
+                        .make(),
+                    Divider(),
+                  ],
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.offAll(() => NavBar());
+              },
+              child: Text("Close"),
+            ),
+          ],
+        ),
+      );
+    }
+    // Get.offAll(()=> NavBar());
   }
 
   @override
@@ -153,10 +230,6 @@ class _AnswerFormState extends State<AnswerForm> {
                       .orderBy('no', descending: false)
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
                     if (snapshot.hasError) {
                       return const Center(child: Text("Error fetching data."));
                     }
@@ -265,15 +338,45 @@ class _AnswerFormState extends State<AnswerForm> {
                           ),
                         ),
                         SizedBox(
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              // Calculate score and show result
-                              _submitAnswers(questions);
-                            },
-                            child: const Text("Submit Answers"),
-                          ),
-                        ),
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if(!Get.isSnackbarOpen){
+                                  Get.snackbar(
+                                    margin: EdgeInsets.all(10),
+                                    padding: EdgeInsets.all(10),
+                                    'Notice',
+                                    "Let's see how you did, hold on!",
+                                    snackPosition: SnackPosition.TOP,
+                                    backgroundColor: Colors.white,
+                                    colorText: AppColor.baseColor,
+                                    duration: Duration(seconds: 3),
+                                    isDismissible:
+                                    false, // Make it non-dismissible until login is complete
+                                  );
+                                }
+                                _submitAnswers(questions);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: AppColor.baseColor,
+                                // Text color
+                                elevation: 5,
+                                // Shadow elevation
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      20), // Rounded corners
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 15),
+                                // Padding
+                                textStyle: const TextStyle(
+                                  fontSize: 18, // Text size
+                                  fontWeight: FontWeight.bold, // Text weight
+                                ),
+                              ),
+                              child: const Text("Submit Answers"),
+                            )),
                         10.heightBox,
                       ],
                     );

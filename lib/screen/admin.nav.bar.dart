@@ -3,20 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:quiz_app/screen/home.dart';
 import 'package:quiz_app/screen/login.dart';
 import 'package:quiz_app/screen/profile.dart';
+import 'package:quiz_app/screen/question.list.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '../fucntion/fetch.dart';
 import '../fucntion/user.model.dart';
 import 'add.form.dart';
 import 'leaderboard.dart';
-class NavBar extends StatefulWidget {
-  const NavBar({super.key});
+class AdminNavBar extends StatefulWidget {
+  const AdminNavBar({super.key});
 
   @override
-  State<NavBar> createState() => _NavBarState();
+  State<AdminNavBar> createState() => _AdminNavBarState();
 }
 
-class _NavBarState extends State<NavBar> {
+class _AdminNavBarState extends State<AdminNavBar> {
   int selected = 0;
   bool heart = false;
   final controller = PageController();
@@ -45,15 +46,22 @@ class _NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: StylishBottomBar(
+        // option: AnimatedBarOptions(
+        //   // iconSize: 32,
+        //   barAnimation: BarAnimation.blink,
+        //   iconStyle: IconStyle.animated,
+
+        //   // opacity: 0.3,
+        // ),
         option: DotBarOptions(
-          dotStyle: DotStyle.circle,
+          dotStyle: DotStyle.tile,
           gradient: const LinearGradient(
             colors: [
               Colors.deepPurple,
               Colors.pink,
             ],
-            // begin: Alignment.topLeft,
-            // end: Alignment.bottomRight,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
         items: [
@@ -69,6 +77,22 @@ class _NavBarState extends State<NavBar> {
             showBadge: true,
             badgeColor: Colors.purple,
             badgePadding: const EdgeInsets.only(left: 4, right: 4),
+          ),
+          BottomBarItem(
+            icon: const Icon(Icons.add_circle),
+            selectedIcon: const Icon(Icons.add_circle),
+            selectedColor: Colors.red,
+            // unSelectedColor: Colors.purple,
+            // backgroundColor: Colors.orange,
+            title: const Text('Add'),
+          ),
+          BottomBarItem(
+            icon: const Icon(Icons.featured_play_list),
+            selectedIcon: const Icon(Icons.featured_play_list),
+            selectedColor: Colors.red,
+            // unSelectedColor: Colors.purple,
+            // backgroundColor: Colors.orange,
+            title: const Text('List'),
           ),
           BottomBarItem(
               icon: const Icon(
@@ -90,9 +114,9 @@ class _NavBarState extends State<NavBar> {
               title: const Text('Profile')),
         ],
         hasNotch: true,
-        // fabLocation: StylishBarFabLocation.end,
+        // fabLocation: StylishBarFabLocation.center,
         currentIndex: selected,
-        notchStyle: NotchStyle.themeDefault,
+        notchStyle: NotchStyle.square,
         onTap: (index) {
           if (index == selected) return;
           controller.jumpToPage(index);
@@ -118,6 +142,8 @@ class _NavBarState extends State<NavBar> {
         controller: controller,
         children: const [
           HomePage(),
+          AddForm(),
+          QuestionList(),
           LeaderboardPage(),
           ProfilePage(),
         ],
