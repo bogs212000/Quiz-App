@@ -1,6 +1,8 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_app/files/colors.dart';
+import 'package:quiz_app/files/sounds.dart';
 import 'package:quiz_app/screen/nav.bar.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:get/get.dart';
@@ -20,10 +22,18 @@ class _AnswerFormState extends State<AnswerForm> {
   int score = 0; // Track score
   bool isQuizCompleted = false; // Check if the quiz is already completed
   String? userEmail = currentUserEmail; // Replace with actual user ID logic
+  late AudioPlayer player = AudioPlayer();
+
+  void _playSound() {
+    player.play(AssetSource('sounds/success.mp3'));
+  }
+
   @override
   void initState() {
     super.initState();
     _checkQuizCompletion();
+    player = AudioPlayer();
+    player.dispose();  // Dispose when no longer needed
   }
 
   void _checkQuizCompletion() async {
@@ -120,6 +130,7 @@ class _AnswerFormState extends State<AnswerForm> {
     } catch (e) {
       print(e);
     }
+    _playSound();
     Get.snackbar(
         margin: EdgeInsets.all(10),
         padding: EdgeInsets.all(10),
@@ -355,6 +366,7 @@ class _AnswerFormState extends State<AnswerForm> {
                                     false, // Make it non-dismissible until login is complete
                                   );
                                 }
+
                                 _submitAnswers(questions);
                               },
                               style: ElevatedButton.styleFrom(
