@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:quiz_app/fucntion/app.model.dart';
 import 'package:quiz_app/fucntion/firebase.dart';
 import 'package:quiz_app/screen/form.dart';
 import 'package:quiz_app/screen/rank.info.dart';
@@ -16,10 +17,11 @@ import '../files/images.dart';
 import '../files/text.dart';
 import '../fucntion/const.dart';
 import '../fucntion/fetch.dart';
+import '../fucntion/function.dart';
 import '../fucntion/user.model.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -27,6 +29,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   UserModel? userModel;
+  AppData? appData;
 
   String getGreeting() {
     final hour = DateTime.now().hour;
@@ -58,8 +61,10 @@ class _HomePageState extends State<HomePage> {
 
   void loadUserData() async {
     UserModel? fetchedUser = await fetchUserData();
+    AppData? fetchedApp = await fetchAppData();
     setState(() {
       userModel = fetchedUser;
+      appData = fetchedApp;
     });
   }
 
@@ -129,6 +134,21 @@ class _HomePageState extends State<HomePage> {
                                     .size(15)
                                     .make(),
                                 10.heightBox,
+                                appData!.update == true ?
+                                SizedBox(
+                                  width: 170,
+                                  child: ElevatedButton(
+                                    onPressed: () => {Get.to(() => RankInfo())},
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                       Icon(Icons.cloud_circle, color: AppColor.baseColor,),
+                                        AppText.update_now.text.make(),
+                                      ],
+                                    ),
+                                  ),
+                                ) :
                                 SizedBox(
                                   width: 170,
                                   child: ElevatedButton(

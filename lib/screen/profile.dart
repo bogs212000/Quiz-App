@@ -15,6 +15,7 @@ import '../fucntion/const.dart';
 import '../fucntion/fetch.dart';
 import '../fucntion/function.dart';
 import '../fucntion/user.model.dart';
+import 'edit.profile.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,6 +25,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   UserModel? userModel;
   double? size;
 
@@ -81,7 +83,11 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           Padding(
             padding: EdgeInsets.only(right: 20),
-            child: Icon(CupertinoIcons.settings),
+            child: GestureDetector(
+                onTap: () {
+                  Get.to(() => EditProfile(), arguments: [userModel!.profile, userModel!.username]);
+                },
+                child: Icon(CupertinoIcons.settings)),
           )
         ],
       ),
@@ -91,24 +97,34 @@ class _ProfilePageState extends State<ProfilePage> {
             rank == 1
                 ? Stack(
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30),
+                        child: VxCircle(
+                          radius: 100,
+                          backgroundImage: DecorationImage(
+                              image: CachedNetworkImageProvider(
+                                  '${userModel!.profile}'),
+                              fit: BoxFit.fill),
+                        ).centered(),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(AvatarFrame.admin_frame, height: 170),
+                          Image.asset(AvatarFrame.admin_frame1, height: 170),
                         ],
                       ),
-                      VxCircle(
-                        radius: 120,
-                        backgroundImage: DecorationImage(
-                            image: CachedNetworkImageProvider('${userModel!.profile}'),
-                            fit: BoxFit.fill),
-                      ).centered(),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 0),
+                        child: SpinKitPulse(
+                            color: Colors.white.withOpacity(0.3), size: 70),
+                      ),
                     ],
                   )
                 : VxCircle(
                     radius: 100,
                     backgroundImage: DecorationImage(
-                        image: CachedNetworkImageProvider('${userModel!.profile}'),
+                        image:
+                            CachedNetworkImageProvider('${userModel!.profile}'),
                         fit: BoxFit.fill),
                   ).centered(),
             10.heightBox,

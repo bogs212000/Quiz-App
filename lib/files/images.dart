@@ -13,5 +13,5 @@ class RankBadges {
   static const rank = 'assets/badges/rank.png';
 }
 class AvatarFrame {
-  static const admin_frame = 'assets/frame/avatar_frame.png';
+  static const admin_frame1 = 'assets/frame/avatar_frame1.png';
 }

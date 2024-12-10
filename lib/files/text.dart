@@ -1,5 +1,6 @@
 class AppText {
   static const feature = 'Feature';
+  static const update_now = 'Update Now';
   static const level = 'Level';
   static const good_morning = 'GOOD MORNING';
   static const good_evening = 'GOOD EVENING';
@@ -11,10 +12,17 @@ class AppText {
   static const login = 'Sign in';
   static const sign_up = 'Sign up';
   static const create_account = 'Create Account';
+  static const edit_account = 'Update profile';
   static const forgot_pass = 'Forgot Password';
   static const welcome_content = 'Put your computer science skills to the test';
   static const play_with_friends = 'Put your computer science skills to the test and unlock exclusive rank badges!';
   static const find_friends = 'See details';
   static const doing_better = 'You are doing better than 60% of other players!';
+  static const greetings_rank_1 = "Congratulations! You're at the top of the leaderboard!";
+  static const greetings_rank_2 = "Amazing effort! You’ve secured the second spot!";
+  static const greetings_rank_3 = "Fantastic effort! You've claimed the third spot!";
+  static const greetings_rank = "Each step forward is a victory in itself, keep going!";
+
+
 
 }

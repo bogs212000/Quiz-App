@@ -95,8 +95,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             final users = snapshot.data!.docs;
 
                             // Get current user's UID
-                            final currentUserEMAIL = FirebaseAuth.instance.currentUser?.email;
-
+                            final currentUserEMAIL =
+                                FirebaseAuth.instance.currentUser?.email;
                             for (int i = 0; i < users.length; i++) {
                               if (users[i].id == currentUserEMAIL) {
                                 rank = i + 1; // Rank is index + 1
@@ -123,6 +123,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                         padding: EdgeInsets.all(8.0),
                                         child: Row(
                                           children: [
+                                            VxCircle(
+                                              radius: 20,
+                                              child: '${index + 1}'.text.center.white.make(),
+                                              backgroundColor: AppColor.baseColor,
+                                            ),
+                                            5.widthBox,
                                             VxCircle(
                                               radius: 60,
                                               backgroundImage: DecorationImage(

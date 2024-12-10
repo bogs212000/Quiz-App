@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:quiz_app/fucntion/app.model.dart';
 import 'package:quiz_app/screen/home.dart';
 import 'package:quiz_app/screen/login.dart';
 import 'package:quiz_app/screen/profile.dart';
@@ -12,6 +13,7 @@ import 'leaderboard.dart';
 class NavBar extends StatefulWidget {
   const NavBar({super.key});
 
+
   @override
   State<NavBar> createState() => _NavBarState();
 }
@@ -22,6 +24,7 @@ class _NavBarState extends State<NavBar> {
   final controller = PageController();
 
   UserModel? userModel;
+  AppData? appData;
 
   @override
   void initState() {
@@ -31,8 +34,10 @@ class _NavBarState extends State<NavBar> {
 
   void loadUserData() async {
     UserModel? fetchedUser = await fetchUserData();
+    AppData? fetchedApp = await fetchAppData();
     setState(() {
       userModel = fetchedUser;
+      appData = fetchedApp;
     });
   }
 
@@ -116,7 +121,7 @@ class _NavBarState extends State<NavBar> {
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       body: PageView(
         controller: controller,
-        children: const [
+        children: [
           HomePage(),
           LeaderboardPage(),
           ProfilePage(),
