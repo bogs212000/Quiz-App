@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,6 +15,7 @@ import 'package:velocity_x/velocity_x.dart';
 
 import '../files/colors.dart';
 import '../files/images.dart';
+import '../files/sounds.dart';
 import '../files/text.dart';
 import '../fucntion/const.dart';
 import '../fucntion/fetch.dart';
@@ -51,6 +53,16 @@ class _HomePageState extends State<HomePage> {
     } else {
       return Icons.nightlight_outlined; // Evening icon
     }
+  }
+
+  late AudioPlayer player = AudioPlayer();
+
+  void _playSoundSuccess() {
+    player.play(AssetSource('sounds/success.mp3'));
+  }
+
+  void _playSoundError() {
+    player.play(AssetSource('sounds/error.mp3'));
   }
 
   @override
@@ -107,12 +119,17 @@ class _HomePageState extends State<HomePage> {
                             .bold
                             .make(),
                         Spacer(),
-                        VxCircle(
-                          radius: 50,
-                          backgroundImage: DecorationImage(
-                              image: CachedNetworkImageProvider(
-                                  '${userModel!.profile}'),
-                              fit: BoxFit.fill),
+                        GestureDetector(
+                          onTap: () {
+                            _playSoundSuccess();
+                          },
+                          child: VxCircle(
+                            radius: 50,
+                            backgroundImage: DecorationImage(
+                                image: CachedNetworkImageProvider(
+                                    '${userModel!.profile}'),
+                                fit: BoxFit.fill),
+                          ),
                         )
                       ],
                     ),
@@ -134,38 +151,44 @@ class _HomePageState extends State<HomePage> {
                                     .size(15)
                                     .make(),
                                 10.heightBox,
-                                appData!.update == true ?
-                                SizedBox(
-                                  width: 170,
-                                  child: ElevatedButton(
-                                    onPressed: () => {Get.to(() => RankInfo())},
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                       Icon(Icons.cloud_circle, color: AppColor.baseColor,),
-                                        AppText.update_now.text.make(),
-                                      ],
-                                    ),
-                                  ),
-                                ) :
-                                SizedBox(
-                                  width: 170,
-                                  child: ElevatedButton(
-                                    onPressed: () => {Get.to(() => RankInfo())},
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        SpinKitPumpingHeart(
-                                          size: 20,
-                                          color: AppColor.baseColor,
+                                appData!.update == true
+                                    ? SizedBox(
+                                        width: 170,
+                                        child: ElevatedButton(
+                                          onPressed: () =>
+                                              {Get.to(() => RankInfo())},
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Icon(
+                                                Icons.cloud_circle,
+                                                color: AppColor.baseColor,
+                                              ),
+                                              AppText.update_now.text.make(),
+                                            ],
+                                          ),
                                         ),
-                                        AppText.find_friends.text.make(),
-                                      ],
-                                    ),
-                                  ),
-                                )
+                                      )
+                                    : SizedBox(
+                                        width: 170,
+                                        child: ElevatedButton(
+                                          onPressed: () =>
+                                              {AppSounds().tap(),
+                                                Get.to(() => RankInfo())},
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              SpinKitPumpingHeart(
+                                                size: 20,
+                                                color: AppColor.baseColor,
+                                              ),
+                                              AppText.find_friends.text.make(),
+                                            ],
+                                          ),
+                                        ),
+                                      )
                               ],
                             ),
                           )
@@ -194,202 +217,209 @@ class _HomePageState extends State<HomePage> {
                     Expanded(
                       child: VxBox(
                         child: StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('levels')
-                                .orderBy('level', descending: false)
-                                .where('status', isEqualTo: true)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return VxBox()
-                                    .height(100)
-                                    .width(double.infinity)
-                                    .white
-                                    .rounded
-                                    .shadow
-                                    .make();
-                              }
+                          stream: FirebaseFirestore.instance
+                              .collection('levels')
+                              .orderBy('level', descending: false)
+                              .where('status', isEqualTo: true)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
 
-                              if (snapshot.hasError) {
-                                return const Center(
-                                    child: Text("Error fetching data."));
-                              }
+                            if (snapshot.hasError) {
+                              return Center(
+                                  child: Text("Error fetching levels."));
+                            }
 
-                              if (!snapshot.hasData ||
-                                  snapshot.data!.docs.isEmpty) {
-                                return const Center(
-                                    child: Text("No data available."));
-                              }
+                            if (!snapshot.hasData ||
+                                snapshot.data!.docs.isEmpty) {
+                              return Center(
+                                  child: Text("No levels available."));
+                            }
 
-                              final levels = snapshot.data!.docs;
-                              String emailUser = FirebaseAuth
-                                  .instance.currentUser!.email
-                                  .toString();
+                            final levels = snapshot.data!.docs;
+                            String emailUser =
+                                FirebaseAuth.instance.currentUser!.email!;
 
-                              return ListView.builder(
-                                itemCount: levels.length,
-                                itemBuilder: (context, index) {
-                                  final level = levels[index];
-                                  String levelId = level['level'].toString();
+                            // Track answered status of the current level
+                            bool hasAnsweredCurrentLevel =
+                                true; // First level is always accessible
 
-                                  return FutureBuilder<QuerySnapshot>(
-                                    future: FirebaseFirestore.instance
-                                        .collection('levels')
-                                        .doc(levelId)
-                                        .collection('who_answered')
-                                        .where('userId',
-                                            isEqualTo:
-                                                emailUser) // Check if the user exists
-                                        .get(),
-                                    builder: (context, userSnapshot) {
-                                      if (userSnapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: VxBox(
-                                                  child: const Center(
-                                                      child:
-                                                          CircularProgressIndicator()))
-                                              .height(100)
-                                              .width(double.infinity)
-                                              .white
-                                              .rounded
-                                              .shadow
-                                              .make(),
-                                        );
-                                      }
+                            return ListView.builder(
+                              itemCount: levels.length,
+                              itemBuilder: (context, index) {
+                                final level = levels[index];
+                                String levelId = level['level'].toString();
 
-                                      if (userSnapshot.hasError) {
-                                        return const Center(
-                                            child: Text(
-                                                "Error checking user data."));
-                                      }
-
-                                      bool hasAnswered =
-                                          userSnapshot.data!.docs.isNotEmpty;
-
-                                      return GestureDetector(
-                                        onTap: () {
-                                          if (hasAnswered) {
-                                            // If the user has already answered, show their score
-                                            Get.snackbar("Info",
-                                                "You already answered this quiz. Your score: ${userSnapshot.data!.docs.first['score']}",
-                                                backgroundColor: Colors.green,
-                                                colorText: Colors.white,
-                                                snackPosition:
-                                                    SnackPosition.BOTTOM,
-                                                margin: EdgeInsets.all(10));
-                                          } else {
-                                            // Navigate to the AnswerForm
-                                            Get.to(() => AnswerForm(),
-                                                arguments: [
-                                                  levelId,
-                                                  level['level'],
-                                                ]);
-                                          }
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 10, right: 10, left: 10),
-                                          child: VxBox(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: VxBox(
-                                                      child: VxBox(
-                                                          child: VxCircle(
-                                                        radius: 70,
-                                                        backgroundImage:
-                                                            const DecorationImage(
-                                                                image: CachedNetworkImageProvider(
-                                                                    '${Images.technology}'),
-                                                                fit: BoxFit
-                                                                    .fill),
-                                                      )).rounded.make(),
-                                                    )
-                                                        .padding(
-                                                            const EdgeInsets
-                                                                .all(5))
-                                                        .make(),
-                                                  ),
-                                                  Expanded(
-                                                    child: VxBox(
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Row(
-                                                            children: [
-                                                              "Level ${level['level']}"
-                                                                  .text
-                                                                  .size(17)
-                                                                  .bold
-                                                                  .make(),
-                                                            ],
-                                                          ),
-                                                          5.heightBox,
-                                                          Row(
-                                                            children: [
-                                                              if (hasAnswered)
-                                                                "Score: ${userSnapshot.data!.docs.first['score']}"
-                                                                    .text
-                                                                    .size(10)
-                                                                    .gray700
-                                                                    .fontFamily(
-                                                                        "Rubik")
-                                                                    .make(),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ).make(),
-                                                  ),
-                                                  Expanded(
-                                                    child: VxBox(
-                                                      child: const Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              Icon(
-                                                                Icons
-                                                                    .navigate_next,
-                                                                size: 30,
-                                                                color: Colors
-                                                                    .deepPurpleAccent,
-                                                              )
-                                                            ],
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ).make(),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                              .height(100)
-                                              .rounded
-                                              .shadowXs
-                                              .white
-                                              .make(),
+                                return FutureBuilder<QuerySnapshot>(
+                                  future: FirebaseFirestore.instance
+                                      .collection('levels')
+                                      .doc(levelId)
+                                      .collection('who_answered')
+                                      .where('userId', isEqualTo: emailUser)
+                                      .get(),
+                                  builder: (context, userSnapshot) {
+                                    if (userSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          height: 100,
+                                          width: double.infinity,
+                                          color: Colors.white,
+                                          child: Center(
+                                              child:
+                                                  CircularProgressIndicator()),
                                         ),
                                       );
-                                    },
-                                  );
-                                },
-                              );
-                            }),
+                                    }
+
+                                    if (userSnapshot.hasError) {
+                                      return Center(
+                                          child: Text("Error loading data."));
+                                    }
+
+                                    // Check if the user has answered the current level
+                                    bool userHasAnswered =
+                                        userSnapshot.data!.docs.isNotEmpty;
+
+                                    // Determine if the current level is accessible
+                                    bool isNextLevelLocked =
+                                        !hasAnsweredCurrentLevel;
+
+                                    // Update `hasAnsweredCurrentLevel` for the next iteration
+                                    hasAnsweredCurrentLevel = userHasAnswered;
+
+                                    return GestureDetector(
+                                      onTap: () {
+                                        if (isNextLevelLocked) {
+                                          _playSoundError();
+                                          // Next level is locked
+                                          if(!Get.isSnackbarOpen){
+                                            Get.snackbar(
+                                              "Locked",
+                                              "You need to complete the previous level to unlock this one.",
+                                              backgroundColor: Colors.redAccent,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+
+                                        } else if (userHasAnswered) {
+                                          _playSoundError();
+                                          // Level already answered
+                                          if(!Get.isSnackbarOpen){
+                                            Get.snackbar(
+                                              "Info",
+                                              "You already answered this level. Your score: ${userSnapshot.data!.docs.first['score']}",
+                                              backgroundColor: Colors.green,
+                                              colorText: Colors.white,
+                                            );
+                                          }
+
+                                        } else {
+                                          // Navigate to the answer form
+                                          Get.to(() => AnswerForm(),
+                                              arguments: [
+                                                levelId,
+                                                level['level'],
+                                              ]);
+                                        }
+                                      },
+                                      child: Opacity(
+                                        opacity: isNextLevelLocked ? 0.5 : 1.0,
+                                        // Dim if locked
+                                        child: Container(
+                                          margin: EdgeInsets.symmetric(
+                                              vertical: 5, horizontal: 10),
+                                          padding: EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.3),
+                                                blurRadius: 3,
+                                                offset: Offset(0, 2),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                flex: 2,
+                                                child: CircleAvatar(
+                                                  radius: 35,
+                                                  backgroundImage:
+                                                      CachedNetworkImageProvider(
+                                                    '${Images.technology}',
+                                                  ),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 5,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Level ${level['level']}",
+                                                      style: TextStyle(
+                                                          fontSize: 17,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    SizedBox(height: 5),
+                                                    if (userHasAnswered)
+                                                      Text(
+                                                        "Score: ${userSnapshot.data!.docs.first['score']}",
+                                                        style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors
+                                                                .grey[700],
+                                                            fontStyle: FontStyle
+                                                                .italic),
+                                                      ),
+                                                    if (isNextLevelLocked)
+                                                      Text(
+                                                        "Locked",
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                          color:
+                                                              Colors.redAccent,
+                                                          fontStyle:
+                                                              FontStyle.italic,
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Icon(
+                                                  Icons.navigate_next,
+                                                  size: 30,
+                                                  color: isNextLevelLocked
+                                                      ? Colors.grey
+                                                      : Colors.deepPurpleAccent,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ).height(double.infinity).width(double.infinity).make(),
                     )
                   ],

@@ -32,8 +32,6 @@ class _AnswerFormState extends State<AnswerForm> {
   void initState() {
     super.initState();
     _checkQuizCompletion();
-    player = AudioPlayer();
-    player.dispose();  // Dispose when no longer needed
   }
 
   void _checkQuizCompletion() async {
@@ -100,7 +98,6 @@ class _AnswerFormState extends State<AnswerForm> {
     try {
       final userRef =
           FirebaseFirestore.instance.collection('users').doc(userEmail);
-
       // Save score to Firestore
       await FirebaseFirestore.instance
           .collection('levels')
@@ -126,6 +123,7 @@ class _AnswerFormState extends State<AnswerForm> {
         transaction.update(userRef, {
           'score': currentScore + score, // Increment total score
         });
+
       });
     } catch (e) {
       print(e);

@@ -11,6 +11,7 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../files/images.dart';
+import '../files/sounds.dart';
 import '../fucntion/const.dart';
 import '../fucntion/fetch.dart';
 import '../fucntion/function.dart';
@@ -53,6 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.only(right: 10),
             child: GestureDetector(
                 onTap: () {
+                  AppSounds().tap();
                   Get.snackbar(
                     'Notice',
                     'Continue to sign out?',
@@ -85,6 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.only(right: 20),
             child: GestureDetector(
                 onTap: () {
+                  AppSounds().tap();
                   Get.to(() => EditProfile(), arguments: [userModel!.profile, userModel!.username]);
                 },
                 child: Icon(CupertinoIcons.settings)),

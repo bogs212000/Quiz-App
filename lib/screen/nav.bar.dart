@@ -6,6 +6,7 @@ import 'package:quiz_app/screen/login.dart';
 import 'package:quiz_app/screen/profile.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
+import '../files/sounds.dart';
 import '../fucntion/fetch.dart';
 import '../fucntion/user.model.dart';
 import 'add.form.dart';
@@ -104,6 +105,7 @@ class _NavBarState extends State<NavBar> {
           setState(() {
             selected = index;
           });
+          AppSounds().tap();
         },
       ),
       // floatingActionButton: FloatingActionButton(
