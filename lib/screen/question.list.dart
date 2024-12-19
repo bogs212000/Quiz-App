@@ -102,23 +102,13 @@ class _QuestionListState extends State<QuestionList> {
 
                       return GestureDetector(
                         onTap: () {
-                          if (hasAnswered) {
-                            // If the user has already answered, show their score
-                            Get.snackbar("Info",
-                                "You already answered this quiz. Your score: ${userSnapshot.data!.docs.first['score']}",
-                                backgroundColor: Colors.green,
-                                colorText: Colors.white,
-                                snackPosition:
-                                SnackPosition.BOTTOM,
-                                margin: EdgeInsets.all(10));
-                          } else {
                             // Navigate to the AnswerForm
                             Get.to(() => AnswerForm(),
                                 arguments: [
                                   levelId,
                                   level['level'],
                                 ]);
-                          }
+
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(
@@ -205,7 +195,7 @@ class _QuestionListState extends State<QuestionList> {
                                               ),
                                               Icon(
                                                 Icons
-                                                    .navigate_next,
+                                                    .remove_red_eye_outlined,
                                                 size: 30,
                                                 color: Colors
                                                     .deepPurpleAccent,

@@ -28,6 +28,7 @@ class _AddFormState extends State<AddForm> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           backgroundColor: AppColor.baseColor,
           foregroundColor: Colors.white,
           title: 'Add Questions'.text.make(),

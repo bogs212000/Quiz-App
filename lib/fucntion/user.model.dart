@@ -3,12 +3,14 @@ class UserModel {
   final String email;
   final String profile;
   final int score;
+  final String role;
 
   UserModel({
     required this.username,
     required this.email,
     required this.profile,
     required this.score,
+    required this.role,
   });
 
   // Factory constructor to create a UserModel from a Map
@@ -17,6 +19,7 @@ class UserModel {
       username: data['username'] ?? '',
       email: data['email'] ?? '',
       profile: data['profile'] ?? '',
+      role: data['role'] ?? '',
       score: data['score'] ?? 0,
     );
   }

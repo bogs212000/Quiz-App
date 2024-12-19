@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:quiz_app/files/colors.dart';
 import 'package:quiz_app/files/sounds.dart';
+import 'package:quiz_app/screen/admin.nav.bar.dart';
 import 'package:quiz_app/screen/home.dart';
 import 'package:quiz_app/screen/nav.bar.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -11,6 +12,7 @@ import 'package:get/get.dart';
 
 import '../files/images.dart';
 import '../fucntion/firebase.dart';
+import '../fucntion/user.model.dart';
 
 class AnswerForm extends StatefulWidget {
   const AnswerForm({super.key});
@@ -25,6 +27,7 @@ class _AnswerFormState extends State<AnswerForm> {
   bool isQuizCompleted = false; // Check if the quiz is already completed
   String? userEmail = currentUserEmail; // Replace with actual user ID logic
   late AudioPlayer player = AudioPlayer();
+  UserModel? userModel;
 
   void _playSound() {
     player.play(AssetSource('sounds/success.mp3'));
@@ -210,9 +213,10 @@ class _AnswerFormState extends State<AnswerForm> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async { Get.back();
-      // Navigate back using GetX
-      return false; // Prevent default back button behavior
+      onWillPop: () async {
+        Get.back();
+        // Navigate back using GetX
+        return false; // Prevent default back button behavior
       },
       child: Scaffold(
         appBar: AppBar(
@@ -225,7 +229,11 @@ class _AnswerFormState extends State<AnswerForm> {
                   cancelBtnText: 'No',
                   text: 'Back to home.',
                   onConfirmBtnTap: () {
-                    Get.offAll(HomePage());
+                    if (userModel!.role == "user") {
+                      Get.offAll(NavBar());
+                    } else {
+                      Get.offAll(AdminNavBar());
+                    }
                   },
                   onCancelBtnTap: () {
                     Navigator.pop(context);
@@ -267,7 +275,8 @@ class _AnswerFormState extends State<AnswerForm> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
-                        return const Center(child: Text("Error fetching data."));
+                        return const Center(
+                            child: Text("Error fetching data."));
                       }
 
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -305,7 +314,8 @@ class _AnswerFormState extends State<AnswerForm> {
                                                 .make(),
                                             leading: Radio<String>(
                                               value: 'a',
-                                              groupValue: userAnswers[questionId],
+                                              groupValue:
+                                                  userAnswers[questionId],
                                               onChanged: (value) {
                                                 setState(() {
                                                   userAnswers[questionId] =
@@ -322,7 +332,8 @@ class _AnswerFormState extends State<AnswerForm> {
                                                 .make(),
                                             leading: Radio<String>(
                                               value: 'b',
-                                              groupValue: userAnswers[questionId],
+                                              groupValue:
+                                                  userAnswers[questionId],
                                               onChanged: (value) {
                                                 setState(() {
                                                   userAnswers[questionId] =
@@ -339,7 +350,8 @@ class _AnswerFormState extends State<AnswerForm> {
                                                 .make(),
                                             leading: Radio<String>(
                                               value: 'c',
-                                              groupValue: userAnswers[questionId],
+                                              groupValue:
+                                                  userAnswers[questionId],
                                               onChanged: (value) {
                                                 setState(() {
                                                   userAnswers[questionId] =
@@ -356,7 +368,8 @@ class _AnswerFormState extends State<AnswerForm> {
                                                 .make(),
                                             leading: Radio<String>(
                                               value: 'd',
-                                              groupValue: userAnswers[questionId],
+                                              groupValue:
+                                                  userAnswers[questionId],
                                               onChanged: (value) {
                                                 setState(() {
                                                   userAnswers[questionId] =
