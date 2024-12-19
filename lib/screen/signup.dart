@@ -265,7 +265,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             snackPosition: SnackPosition.BOTTOM,
                             backgroundColor: Colors.white,
                             colorText: AppColor.baseColor,
-                            duration: Duration(seconds: 3),
+                            duration: null,
                             isDismissible:
                                 false, // Make it non-dismissible until login is complete
                           );

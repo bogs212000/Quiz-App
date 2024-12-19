@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:quiz_app/files/colors.dart';
+import 'package:quiz_app/fucntion/function.dart';
+import 'package:quiz_app/screen/nav.bar.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../files/images.dart';
@@ -15,8 +17,10 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  final TextEditingController urlController = TextEditingController(text: Get.arguments[0]);
-  final TextEditingController usernameController = TextEditingController(text: Get.arguments[1]);
+  final TextEditingController urlController =
+      TextEditingController(text: Get.arguments[0]);
+  final TextEditingController usernameController =
+      TextEditingController(text: Get.arguments[1]);
   String? url;
 
   @override
@@ -35,8 +39,9 @@ class _EditProfileState extends State<EditProfile> {
                 radius: 100,
                 backgroundImage: DecorationImage(
                   image: (url == null ||
-                      url!.isEmpty) // Check for null or empty string
-                      ? NetworkImage(Get.arguments[0].toString()) as ImageProvider
+                          url!.isEmpty) // Check for null or empty string
+                      ? NetworkImage(Get.arguments[0].toString())
+                          as ImageProvider
                       : NetworkImage(url!),
                   fit: BoxFit.fill,
                 ),
@@ -109,6 +114,21 @@ class _EditProfileState extends State<EditProfile> {
                   Spacer(),
                   ElevatedButton(
                       onPressed: () {
+                        Get.snackbar(
+                          margin: EdgeInsets.all(10),
+                          padding: EdgeInsets.all(10),
+                          'Loading',
+                          'Please wait while updating your data.',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.white,
+                          colorText: AppColor.baseColor,
+                          duration: null,
+                          isDismissible:
+                          false, // Make it non-dismissible until login is complete
+                        );
+                         AuthService().updateProfile(
+                            usernameController.text, urlController.text);
+
                       },
                       child: 'Save'.text.bold.make()),
                 ],
@@ -117,7 +137,7 @@ class _EditProfileState extends State<EditProfile> {
           ),
         ),
       )
-      .padding(EdgeInsets.only(left: 40, right: 40, top: 20))
+          .padding(EdgeInsets.only(left: 40, right: 40, top: 20))
           .color(AppColor.baseColor)
           .height(MediaQuery.of(context).size.height)
           .width(MediaQuery.of(context).size.width)

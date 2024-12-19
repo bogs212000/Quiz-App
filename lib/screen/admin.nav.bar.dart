@@ -28,6 +28,7 @@ class _AdminNavBarState extends State<AdminNavBar> {
   void initState() {
     super.initState();
     loadUserData();
+    getPlayerRank(setState);
   }
 
   void loadUserData() async {

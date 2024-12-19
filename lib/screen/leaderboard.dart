@@ -155,7 +155,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                                     ),
                                                     Row(
                                                       children: [
-                                                        "$score Scores"
+                                                        "$score Stars"
                                                             .text
                                                             .bold
                                                             .fontFamily('Rubik')

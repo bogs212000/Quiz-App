@@ -31,6 +31,7 @@ class _NavBarState extends State<NavBar> {
   void initState() {
     super.initState();
     loadUserData();
+    getPlayerRank(setState);
   }
 
   void loadUserData() async {

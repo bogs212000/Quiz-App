@@ -8,10 +8,13 @@ import 'package:quiz_app/auth/auth.wrapper.dart';
 import 'package:quiz_app/fucntion/firebase.dart';
 import 'package:uuid/uuid.dart';
 
+import '../screen/nav.bar.dart';
+
 class AuthService {
   Future<void> signIn(String email, String password) async {
     try {
       await auth.signInWithEmailAndPassword(email: email, password: password);
+      Get.back();
       Get.snackbar(
         'Login Successful',
         'Welcome back, $email!',
@@ -66,6 +69,59 @@ class AuthService {
             color: Colors.white), // Icon to show on the snackbar
       );
       print("An unknown error occurred: $e");
+    }
+  }
+
+  Future<void> forgotPass(String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      Get.snackbar(
+        'Link sent',
+        'Please check your email!',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: Duration(seconds: 5),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        '$e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 5),
+      );
+    }
+  }
+
+  Future<void> updateProfile(String username, pic) async {
+    String email = FirebaseAuth.instance.currentUser!.email.toString();
+    try {
+      Get.back();
+      await FirebaseFirestore.instance.collection('users').doc(email).update({
+        'username': username,
+        'profile': pic,
+      });
+      Get.snackbar(
+        'Notice',
+        'Your profile is up to date!',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: Duration(seconds: 5),
+      );
+      Get.offAll(NavBar());
+    } catch (e) {
+      Get.back();
+      Get.snackbar(
+        'Error',
+        '$e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 5),
+      );
     }
   }
 
@@ -146,10 +202,7 @@ class AuthService {
       duration: Duration(seconds: 3),
       // Duration the snackbar will show
       icon: const Icon(Icons.info,
-          color: Colors
-              .white), // Icon to show on the snackbar
+          color: Colors.white), // Icon to show on the snackbar
     );
   }
 }
-
-

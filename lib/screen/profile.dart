@@ -152,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   CupertinoIcons.star,
                                   color: Colors.white,
                                 ),
-                                'Scores'.text.color(Colors.white54).make(),
+                                'Stars'.text.color(Colors.white54).make(),
                                 '${userModel!.score}'
                                     .text
                                     .color(Colors.white)
@@ -180,7 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               height: 60,
                               width: 60,
                             )
-                          else if (userModel!.score > 10)
+                          else if (userModel!.score > 20)
                             Image.asset(
                               RankBadges.rank,
                               height: 50,
