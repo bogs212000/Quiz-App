@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:quiz_app/files/colors.dart';
 import 'package:quiz_app/files/sounds.dart';
@@ -229,11 +230,8 @@ class _AnswerFormState extends State<AnswerForm> {
                   cancelBtnText: 'No',
                   text: 'Back to home.',
                   onConfirmBtnTap: () {
-                    if (userModel!.role == "user") {
-                      Get.offAll(NavBar());
-                    } else {
-                      Get.offAll(AdminNavBar());
-                    }
+                    Get.back();
+                    Get.back();
                   },
                   onCancelBtnTap: () {
                     Navigator.pop(context);
@@ -391,20 +389,16 @@ class _AnswerFormState extends State<AnswerForm> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (!Get.isSnackbarOpen) {
-                                    Get.snackbar(
-                                      margin: EdgeInsets.all(10),
-                                      padding: EdgeInsets.all(10),
-                                      'Notice',
-                                      "Let's see how you did, hold on!",
-                                      snackPosition: SnackPosition.TOP,
-                                      backgroundColor: Colors.white,
-                                      colorText: AppColor.baseColor,
-                                      duration: null,
-                                      isDismissible:
-                                          false, // Make it non-dismissible until login is complete
-                                    );
+                                    showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return LoadingAnimationWidget
+                                              .threeArchedCircle(
+                                                  color: AppColor.white,
+                                                  size: 40);
+                                        });
                                   }
-
                                   _submitAnswers(questions);
                                 },
                                 style: ElevatedButton.styleFrom(

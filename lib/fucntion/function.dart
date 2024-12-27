@@ -9,20 +9,21 @@ import 'package:quiz_app/fucntion/firebase.dart';
 import 'package:uuid/uuid.dart';
 
 import '../screen/nav.bar.dart';
+import 'const.dart';
 
 class AuthService {
   Future<void> signIn(String email, String password) async {
     try {
       await auth.signInWithEmailAndPassword(email: email, password: password);
-      Get.back();
-      Get.snackbar(
-        'Login Successful',
-        'Welcome back, $email!',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        duration: Duration(seconds: 3),
-      );
+      // Get.snackbar(
+      //   'Login Successful',
+      //   'Welcome back, $email!',
+      //   snackPosition: SnackPosition.BOTTOM,
+      //   backgroundColor: Colors.green,
+      //   colorText: Colors.white,
+      //   duration: Duration(seconds: 3),
+      // );
+     Get.back();
       Get.offAll(() => AuthWrapper());
       print("User signed in successfully");
     } on FirebaseAuthException catch (e) {
@@ -33,6 +34,7 @@ class AuthService {
       } else if (e.code == 'wrong-password') {
         print("Wrong password provided.");
       }
+      Get.back();
       Get.snackbar(
         'Error', // Title
         '${e.code}', // Message
@@ -136,7 +138,7 @@ class AuthService {
       });
       await auth.createUserWithEmailAndPassword(
           email: email, password: password);
-
+      Get.back();
       Get.snackbar(
         'Account has been created',
         'Welcome, $email!',
@@ -148,6 +150,7 @@ class AuthService {
       Get.offAll(() => AuthWrapper());
       print("User signed in successfully");
     } on FirebaseAuthException catch (e) {
+      Get.back();
       print("Error signing in: ${e.message}");
       // You can handle specific errors here, for example:
       if (e.code == 'user-not-found') {

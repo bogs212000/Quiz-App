@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:quiz_app/files/colors.dart';
 import 'package:quiz_app/fucntion/function.dart';
 import 'package:quiz_app/screen/home.dart';
@@ -257,18 +258,14 @@ class _SignUpPageState extends State<SignUpPage> {
                                 false, // Make it non-dismissible until login is complete
                           );
                         } else {
-                          Get.snackbar(
-                            margin: EdgeInsets.all(10),
-                            padding: EdgeInsets.all(10),
-                            'Loading',
-                            'Please wait while we process your Sign up.',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.white,
-                            colorText: AppColor.baseColor,
-                            duration: null,
-                            isDismissible:
-                                false, // Make it non-dismissible until login is complete
-                          );
+                          showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return
+                                  LoadingAnimationWidget.threeArchedCircle(
+                                      color: AppColor.white, size: 40);
+                              });
                           AuthService().signUp(
                               emailController.text.trim().toLowerCase(),
                               passwordController.text.trim(),
