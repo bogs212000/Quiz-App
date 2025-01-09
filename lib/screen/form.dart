@@ -59,6 +59,15 @@ class _AnswerFormState extends State<AnswerForm> {
   Future<void> _submitAnswers(List<QueryDocumentSnapshot> questions) async {
     final quizId = Get.arguments[1];
     // Validate all questions have an answer
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return LoadingAnimationWidget
+              .threeArchedCircle(
+              color: AppColor.white,
+              size: 40);
+        });
     if (userAnswers.length != questions.length) {
       // Show error if not all questions are answered
       Get.back();
@@ -388,17 +397,7 @@ class _AnswerFormState extends State<AnswerForm> {
                               height: 50,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  if (!Get.isSnackbarOpen) {
-                                    showDialog(
-                                        context: context,
-                                        barrierDismissible: false,
-                                        builder: (BuildContext context) {
-                                          return LoadingAnimationWidget
-                                              .threeArchedCircle(
-                                                  color: AppColor.white,
-                                                  size: 40);
-                                        });
-                                  }
+
                                   _submitAnswers(questions);
                                 },
                                 style: ElevatedButton.styleFrom(
